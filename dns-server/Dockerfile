@@ -20,7 +20,7 @@ RUN apk update && apk upgrade && \
 FROM alpine:latest
 
 ENV DEBUG='0'
-ENV BIRD='172.55.0.2'
+ENV BIRD='172.20.0.2'
 ENV UPSTREAM='dns.google'
 ENV UPSTREAM_IP='8.8.8.8'
 ENV ROUTE='10.0.0.1'
