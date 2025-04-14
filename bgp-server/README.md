@@ -11,8 +11,6 @@ add interface=veth1-bgp list=LAN
 add bridge=bridge-docker interface=veth1-bgp
 /ip address
 add address=172.55.0.1/24 interface=bridge-docker network=172.55.0.0
-/container
-add envlist=bgp remote-image=oneevil/bgp-server:latest interface=veth1-bgp logging=yes mounts=storage root-dir=containers/bgp start-on-boot=yes workdir=/
 /container envs
 add key=DNSTAP name=bgp value=172.55.0.3
 add key=DNSTAP_SECONDIP name=bgp value=172.55.0.4
@@ -20,6 +18,8 @@ add key=ROUTE name=bgp value=192.168.50.1
 add key=ROUTE_SECOND name=bgp value=192.168.60.1
 /container mounts
 add dst=/data name=storage src=/storage
+/container
+add envlist=bgp remote-image=oneevil/bgp-server:latest interface=veth1-bgp logging=yes mounts=storage root-dir=containers/bgp start-on-boot=yes workdir=/
 /routing bgp connection
 add as=65010 disabled=no local.address=172.55.0.1 .role=ebgp multihop=yes \
     name=bgp remote.address=172.55.0.2/32 .as=64515 .port=179 router-id=\
