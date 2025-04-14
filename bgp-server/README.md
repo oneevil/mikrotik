@@ -69,3 +69,21 @@ route 12.129.184.160/29 reject;
 ```
 
 > **Note:** You can include multiple `.txt` files in each folder. All valid route entries will be processed automatically.
+
+## Applying Changes to Static Routes
+
+After modifying the files in the `static` and/or `static_second` folders, it is necessary to apply the changes for them to take effect.
+
+### Options for Applying Changes
+
+1. **Restart the container:**
+   - You can restart the container to apply the changes.
+   - This method will reload all configurations, but it might be slower and interrupt active connections.
+
+2. **Using the container's shell (recommended):**
+   - A more efficient approach is to directly apply the changes using the container's shell.
+   - Access the container via the terminal and execute the following command:
+
+   ```bash
+   /container shell 0
+   # birdc configure
