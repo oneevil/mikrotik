@@ -37,4 +37,4 @@ Below are the environment variables used to configure the network settings:
 | `ROUTE`            | The IP address of the gateway used for routing.                             |
 | `ROUTE_SECOND`     | The second IP address of the gateway used for routing (optional).           |
 
-> **Note:** Parameters marked as optional can be omitted if not needed.
+> **Note:** Parameters marked as optional can be omitted if you are using a single route.
