@@ -25,3 +25,16 @@ add as=65010 disabled=no local.address=172.55.0.1 .role=ebgp multihop=yes \
     name=bgp remote.address=172.55.0.2/32 .as=64515 .port=179 router-id=\
     172.55.0.1 routing-table=main
 ```
+
+## Configuration Parameters
+
+Below are the environment variables used to configure the network settings:
+
+| Variable           | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------|
+| `DNSTAP`           | The first IP address of the local DNS server configured with `dns-server`. |
+| `DNSTAP_SECONDIP`  | The second IP address of the local DNS server with `dns-server` (optional). |
+| `ROUTE`            | The IP address of the gateway used for routing.                             |
+| `ROUTE_SECOND`     | The second IP address of the gateway used for routing (optional).           |
+
+> **Note:** Parameters marked as optional can be omitted if not needed.
