@@ -27,6 +27,7 @@ ENV ROUTE='10.0.0.1'
 ENV ROUTE_SECOND='10.0.0.2'
 ENV FALLBACK_UPSTEAM='0'
 ENV SECOND_TUNNEL='0'
+ENV TTL='24h'
 
 RUN apk update && apk upgrade && \
     apk add --no-cache dnsdist && \

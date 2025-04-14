@@ -3,6 +3,8 @@
 ip=$(hostname -i)
 ip1=$(echo "$ip" | cut -d ' ' -f 1)
 ip2=$(echo "$ip" | cut -d ' ' -f 2)
+cfg="/etc/dnstap.conf"
+cfg_second="/etc/dnstap_second.conf"
 echo "Container IP: $ip" 
 if [[ "$DEBUG" -eq 1 ]]; then echo "DEBUG MODE on"; fi
 if [[ "$SECOND_TUNNEL" -eq 1 ]]; then echo "SECOND TUNNEL MODE on"; fi
@@ -11,16 +13,18 @@ echo ""
 echo "Starting dnstap server..."
 mkdir -p /data/cache
 if [ ! -f "/data/domains.txt" ]; then echo "example.com" > /data/domains.txt; fi
-sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip1\"/g" /etc/dnstap.conf
-sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip1\"/g" /etc/dnstap.conf
-sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE\"/g" /etc/dnstap.conf
-sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" /etc/dnstap.conf
+sed -i "s/ttl = \"[^\"]*\"/ttl = \"$TTL\"/g" "$cfg"
+sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip1\"/g" "$cfg"
+sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip1\"/g" "$cfg"
+sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE\"/g" "$cfg"
+sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" "$cfg"
 if [[ "$SECOND_TUNNEL" -eq 1 ]]; then
         if [ ! -f "/data/domains_second.txt" ]; then echo "example.ru" > /data/domains_second.txt;  fi
-        sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip2\"/g" /etc/dnstap_second.conf
-        sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip2\"/g" /etc/dnstap_second.conf
-        sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE_SECOND\"/g" /etc/dnstap_second.conf
-        sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" /etc/dnstap_second.conf
+        sed -i "s/ttl = \"[^\"]*\"/ttl = \"$TTL\"/g" "$cfg_second"
+        sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip2\"/g" "$cfg_second"
+        sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip2\"/g" "$cfg_second"
+        sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE_SECOND\"/g" "$cfg_second"
+        sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" "$cfg_second"
 fi
 if [[ "$DEBUG" -eq 1 ]]; then
         mkdir -p /data/logs
