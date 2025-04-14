@@ -38,3 +38,34 @@ Below are the environment variables used to configure the network settings:
 | `ROUTE_SECOND`     | The second IP address of the gateway used for routing (optional).           |
 
 > **Note:** Parameters marked as optional can be omitted if you are using a single route.
+
+## Container Mounts
+
+The container includes the following mount configuration:
+
+```
+add dst=/data name=unblock src=/unblock
+```
+
+This mount point (`/data`) contains two folders:
+
+- `static`
+- `static_second`
+
+Each of these folders contains `.txt` files with static routing rules.
+
+### Example Route File (`.txt`)
+
+```txt
+route 64.233.165.94/32 reject;
+route 35.207.188.57/32 reject;
+route 35.207.81.249/32 reject;
+route 35.207.171.222/32 reject;
+route 195.62.89.0/24 reject;
+route 66.22.192.0/18 reject;
+route 64.71.8.96/29 reject;
+route 34.0.240.0/22 reject;
+route 12.129.184.160/29 reject;
+```
+
+> **Note:** You can include multiple `.txt` files in each folder. All valid route entries will be processed automatically.
