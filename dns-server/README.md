@@ -23,6 +23,8 @@ add key=ROUTE name=dns value=192.168.50.1
 add key=ROUTE_SECOND name=dns value=192.168.60.1
 /container mounts
 add dst=/data name=storage src=/storage
+/ip dns
+set servers=172.55.0.3
 
 ```
 
