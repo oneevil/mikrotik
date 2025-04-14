@@ -41,7 +41,7 @@ if [[ "$SECOND_TUNNEL" -eq 1 ]]; then
         sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip3\"/g" "$cfg_dnstap_second"
         sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip3\"/g" "$cfg_dnstap_second"
         sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE_SECOND\"/g" "$cfg_dnstap_second"
-        sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" "$cfg_seccfg_dnstap_secondond"
+        sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" "$cfg_dnstap_second"
 fi
 if [[ "$DEBUG" -eq 1 ]]; then
         mkdir -p /data/logs
