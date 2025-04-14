@@ -1,0 +1,79 @@
+#!/bin/sh
+
+ip=$(hostname -i)
+set -- $ip
+ip1=$1
+ip2=$2
+ip3=$3
+ipgw=$(ip r | awk '/default/ {print $3}')
+cfg_bird="/etc/bird.conf"
+cfg_dnstap="/etc/dnstap.conf"
+cfg_dnstap_second="/etc/dnstap_second.conf"
+echo "Container IP: $ip" 
+echo "Container gateway IP: $ipgw"
+if [[ "$DEBUG" -eq 1 ]]; then echo "DEBUG MODE on"; fi
+if [[ "$SECOND_TUNNEL" -eq 1 ]]; then echo "SECOND TUNNEL MODE on"; fi
+if [[ "$FALLBACK_UPSTEAM" -eq 1 ]]; then echo "FALLBACK UPSTEAM on"; fi
+echo ""
+echo "Starting bird server..."
+mkdir -p /data/static /data/static_second
+sed -i "s/router id \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/router id $ip1/g" "$cfg_bird"
+sed -i "s/source address \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/source address $ip1/g" "$cfg_bird"
+sed -i "s/neighbor \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\} as 65010/neighbor $ipgw as 65010/g" "$cfg_bird"
+sed -i "s/neighbor \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\} as 65000/neighbor $DNSTAP as 65000/g" "$cfg_bird"
+sed -i "s/neighbor \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\} as 65001/neighbor $DNSTAP_SECONDIP as 65001/g" "$cfg_bird"
+sed -i "/proto = \"first\"/,/accept;/s/bgp_next_hop = \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\+;/bgp_next_hop = $ROUTE;/" "$cfg_bird"
+sed -i "/proto = \"second\"/,/accept;/s/bgp_next_hop = \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\+;/bgp_next_hop = $ROUTE_SECOND;/" "$cfg_bird"
+bird -f &
+echo ""
+echo "Starting dnstap server..."
+mkdir -p /data/cache
+if [ ! -f "/data/domains.txt" ]; then echo "example.com" > /data/domains.txt; fi
+sed -i "s/ttl = \"[^\"]*\"/ttl = \"$TTL\"/g" "$cfg_dnstap"
+sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip2\"/g" "$cfg_dnstap"
+sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip2\"/g" "$cfg_dnstap"
+sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE\"/g" "$cfg_dnstap"
+sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" "$cfg_dnstap"
+if [[ "$SECOND_TUNNEL" -eq 1 ]]; then
+        if [ ! -f "/data/domains_second.txt" ]; then echo "example.ru" > /data/domains_second.txt;  fi
+        sed -i "s/ttl = \"[^\"]*\"/ttl = \"$TTL\"/g" "$cfg_dnstap_second"
+        sed -i "s/routerID = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/routerID = \"$ip3\"/g" "$cfg_dnstap_second"
+        sed -i "s/sourceIP = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/sourceIP = \"$ip3\"/g" "$cfg_dnstap_second"
+        sed -i "s/nextHop = \"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"/nextHop = \"$ROUTE_SECOND\"/g" "$cfg_dnstap_second"
+        sed -i "s/peers = \[\"\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}\"\]/peers = [\"$BIRD\"]/g" "$cfg_seccfg_dnstap_secondond"
+fi
+if [[ "$DEBUG" -eq 1 ]]; then
+        mkdir -p /data/logs
+        LOGDNSSTAP="/data/logs/dnstap.log"
+        echo "dnstap logs save in $LOGDNSSTAP"
+else
+        LOGDNSSTAP="/dev/null"
+fi
+dnstap-bgp -config /etc/dnstap.conf > $LOGDNSSTAP 2>&1 &
+if [[ "$SECOND_TUNNEL" -eq 1 ]]; then
+        echo ""
+        echo "Starting dnstap second server..."
+        if [[ "$DEBUG" -eq 1 ]]; then
+                LOGDNSSTAP_SECOND="/data/logs/dnstap_second.log"
+                echo "dnstap second logs save in $LOGDNSSTAP_SECOND"
+        else
+                LOGDNSSTAP_SECOND="/dev/null"
+        fi
+        dnstap-bgp -config /etc/dnstap_second.conf > $LOGDNSSTAP_SECOND 2>&1 &
+fi
+sleep 5
+echo ""
+echo "Starting dnsdist server..."
+sed -i "1c\setLocal(\"$ip1:53\")" /etc/dnsdist.conf
+if [[ -n "${UPSTREAM:-}" && -n "${UPSTREAM_IP:-}" ]]; then
+        sed -i "5c\newServer({address=\"$UPSTREAM_IP\", tls=\"openssl\", subjectName=\"$UPSTREAM\", dohPath=\"/dns-query\", validateCertificates=true, checkInterval=60, maxCheckFailures=5})" /etc/dnsdist.conf
+fi
+if [[ "$FALLBACK_UPSTEAM" -eq 1 ]]; then sed -i "6c\FALLBACK_UPSTEAM = 1" /etc/dnsdist.conf; fi
+if [[ "$SECOND_TUNNEL" -eq 1 ]]; then sed -i "7c\SECOND_TUNNEL = 1" /etc/dnsdist.conf; fi
+if [[ "$DEBUG" -eq 1 ]]; then
+        LOGDNSDIST="/data/logs/dnsdist.log"
+        echo "dnstap logs save in $LOGDNSDIST"
+        dnsdist -v --disable-syslog --supervised > $LOGDNSDIST 2>&1
+else
+        dnsdist --disable-syslog --supervised
+fi
