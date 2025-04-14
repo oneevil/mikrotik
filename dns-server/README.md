@@ -12,7 +12,7 @@ add bridge=bridge-docker interface=veth2-dns
 /ip address
 add address=172.55.0.1/24 interface=bridge-docker network=172.55.0.0
 /container
-add envlist=dns remote-image=oneevil/dns-server:latest interface=veth2-dns logging=yes mounts=unblock root-dir=containers/dns start-on-boot=yes workdir=/
+add envlist=dns remote-image=oneevil/dns-server:latest interface=veth2-dns logging=yes mounts=storage root-dir=containers/dns start-on-boot=yes workdir=/
 /container envs
 add key=UPSTREAM name=dns value=dns.google
 add key=UPSTREAM_IP name=dns value=8.8.8.8
@@ -22,7 +22,7 @@ add key=SECOND_TUNNEL name=dns value=1
 add key=ROUTE name=dns value=192.168.50.1
 add key=ROUTE_SECOND name=dns value=192.168.60.1
 /container mounts
-add dst=/data name=unblock src=/unblock
+add dst=/data name=storage src=/storage
 
 ```
 
@@ -57,7 +57,7 @@ Below are the key-value pairs used to configure the DNS container:
 The container includes the following mount configuration:
 
 ```
-add dst=/data name=unblock src=/unblock
+add dst=/data name=storage src=/storage
 ```
 
 This mount point (`/data`) contains two files:
