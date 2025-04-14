@@ -31,7 +31,7 @@ add as=65010 disabled=no local.address=172.20.0.1 .role=ebgp multihop=yes \
     name=bgp remote.address=172.20.0.2/32 .as=64515 .port=179 router-id=\
     172.20.0.1 routing-table=main
 /ip dns
-set servers=172.20.0.3
+set servers=172.20.0.2
 
 ```
 
