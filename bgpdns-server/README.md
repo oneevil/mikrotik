@@ -38,10 +38,10 @@ set servers=172.20.0.2
 ## Network Configuration Parameters
 
 ```text
-add address=172.20.0.3/24,172.20.0.4/24 gateway=172.20.0.1 gateway6="" name=veth2-bgpdns
+add address=172.20.0.2/24,172.20.0.3/24,172.20.0.4/24 gateway=172.20.0.1 gateway6="" name=veth2-bgpdns
 ```
 
-The IP addresses assigned to the interface (comma-separated). Multiple IP addresses are required if multiple routes are configured. This allows different `next-hop` addresses to be set for each list of domains.
+The IP addresses assigned to the interface (comma-separated). Three IP addresses are required if multiple routes are configured, else if you use one routes needed two IP addresses. This allows different `next-hop` addresses to be set for each list of domains.
 
 > **Note:** Multiple IP addresses are needed for configuring multiple `next-hop` addresses for different domain lists when using multiple routes.
 
