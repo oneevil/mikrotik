@@ -22,7 +22,8 @@ add key=ROUTE_SECOND name=dns value=192.168.60.1
 /container mounts
 add dst=/data name=storage src=/storage
 /container
-add envlist=dns remote-image=oneevil/dns-server:latest interface=veth2-dns logging=yes mounts=storage root-dir=containers/dns start-on-boot=yes workdir=/
+add envlist=dns remote-image=oneevil/dns-server:latest interface=veth2-dns logging=yes \
+    mounts=storage root-dir=containers/dns start-on-boot=yes workdir=/
 /ip dns
 set servers=172.20.0.3
 
@@ -73,3 +74,8 @@ This mount point (`/data`) contains two files:
 example.com
 example1.com
 ```
+
+## Applying Changes to DNS Routes
+
+1. **Restart the container:**
+   - You can restart the container to apply the changes.
