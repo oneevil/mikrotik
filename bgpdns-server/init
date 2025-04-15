@@ -16,8 +16,7 @@ if [[ "$SECOND_TUNNEL" -eq 1 ]]; then echo "SECOND TUNNEL MODE on"; fi
 if [[ "$FALLBACK_UPSTEAM" -eq 1 ]]; then echo "FALLBACK UPSTEAM on"; fi
 echo ""
 echo "Starting bird server..."
-mkdir -p /data/static
-if [[ "$SECOND_TUNNEL" -eq 1 ]]; then mkdir -p /data/static_second; fi
+mkdir -p /data/static /data/static_second
 sed -i "s/router id \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/router id $ip1/g" "$cfg_bird"
 sed -i "s/source address \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/source address $ip1/g" "$cfg_bird"
 sed -i "s/neighbor \([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\} as 65010/neighbor $ipgw as 65010/g" "$cfg_bird"
