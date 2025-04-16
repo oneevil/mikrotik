@@ -21,7 +21,7 @@ add key=FALLBACK_UPSTEAM name=bgpdns value=1
 add key=SECOND_TUNNEL name=bgpdns value=1
 add key=ROUTE name=bgpdns value=192.168.50.1
 add key=ROUTE_SECOND name=bgpdns value=192.168.60.1
-add key=TTL name=dns value=720h
+add key=TTL name=bgpdns value=720h
 /container mounts
 add dst=/data name=storage src=/storage
 /container
