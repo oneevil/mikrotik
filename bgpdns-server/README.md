@@ -21,6 +21,7 @@ add key=FALLBACK_UPSTEAM name=bgpdns value=1
 add key=SECOND_TUNNEL name=bgpdns value=1
 add key=ROUTE name=bgpdns value=192.168.50.1
 add key=ROUTE_SECOND name=bgpdns value=192.168.60.1
+add key=TTL name=dns value=720h
 /container mounts
 add dst=/data name=storage src=/storage
 /container
@@ -67,6 +68,7 @@ Below are the key-value pairs used to configure the DNS container:
 | `SECOND_TUNNEL`      | 1                   | Enables second tunnel interface (`1` = enabled).                           |
 | `ROUTE`              | 192.168.50.1        | The IP address of the gateway used for routing.                            |
 | `ROUTE_SECOND`       | 192.168.60.1        | Secondary gateway IP for routing (used if multiple routes are configured). |
+| `TTL`                | 720h                | Storage time of the route received through the domain name (optional).     |
 
 > **Note:** Parameters marked as optional can be omitted if you are using a single route.
 
