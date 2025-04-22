@@ -53,8 +53,16 @@ sed -i "1c\setLocal(\"$ip1:53\")" /etc/dnsdist.conf
 if [[ -n "${UPSTREAM:-}" && -n "${UPSTREAM_IP:-}" ]]; then
         sed -i "5c\newServer({address=\"$UPSTREAM_IP\", tls=\"openssl\", subjectName=\"$UPSTREAM\", dohPath=\"/dns-query\", validateCertificates=true, checkInterval=60, maxCheckFailures=5})" /etc/dnsdist.conf
 fi
-if [[ "$FALLBACK_UPSTEAM" -eq 1 ]]; then sed -i "6c\FALLBACK_UPSTEAM = 1" /etc/dnsdist.conf; fi
-if [[ "$SECOND_TUNNEL" -eq 1 ]]; then sed -i "7c\SECOND_TUNNEL = 1" /etc/dnsdist.conf; fi
+if [[ "$FALLBACK_UPSTEAM" -eq 1 ]]; then
+        sed -i "6c\FALLBACK_UPSTEAM = 1" /etc/dnsdist.conf
+else
+        sed -i "6c\FALLBACK_UPSTEAM = 0" /etc/dnsdist.conf
+fi
+if [[ "$SECOND_TUNNEL" -eq 1 ]]; then
+        sed -i "7c\SECOND_TUNNEL = 1" /etc/dnsdist.conf
+else
+        sed -i "7c\SECOND_TUNNEL = 0" /etc/dnsdist.conf
+fi
 if [[ "$DEBUG" -eq 1 ]]; then
         LOGDNSDIST="/data/logs/dnsdist.log"
         echo "dnstap logs save in $LOGDNSDIST"
